@@ -7,12 +7,12 @@ import { trim, startsWith } from 'lodash/string';
 import React from 'react';
 import countryData from './country_data.js';
 import classNames from 'classnames';
+import style from './style.less'
 
 let allCountries = countryData.allCountries;
 
 let isModernBrowser = Boolean(document.createElement('input').setSelectionRange);
 
-var style = require('./react-phone-input-style.less');
 
 let keys = {
   UP: 38,
