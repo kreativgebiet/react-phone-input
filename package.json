@@ -1,6 +1,6 @@
 {
   "name": "@iduuck/react-phone-input",
-  "version": "1.2.0-alpha.3",
+  "version": "1.2.0-alpha.4",
   "description": "A react component to format phone numbers",
   "main": "lib/index.js",
   "scripts": {
