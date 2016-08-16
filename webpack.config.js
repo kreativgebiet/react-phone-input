@@ -1,6 +1,9 @@
 var path = require('path');
 var webpack = require('webpack');
 var merge = require('webpack-merge');
+var Dashboard = require('webpack-dashboard');
+var DashboardPlugin = require('webpack-dashboard/plugin');
+var dashboard = new Dashboard();
 
 var TARGET = process.env.TARGET;
 var ROOT_PATH = path.resolve(__dirname);
@@ -34,7 +37,10 @@ var common = {
         loader: "style!css!less"
       }
     ]
-  }
+  },
+  plugins: [
+    new DashboardPlugin(dashboard.setData),
+  ]
 };
 
 //Development configuration settings
