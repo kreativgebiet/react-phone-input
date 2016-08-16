@@ -1,27 +1,20 @@
+// TODO - fix the onlyContries props. Currently expects that as an array of country object, but users should be able to send in array of country isos
 
-import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
-import classNames from 'classnames'
-
-// Load in some ponyfills and stuff
-import findIndex from 'lodash/findIndex'
-import some from 'lodash/some'
-import reduce from 'lodash/reduce'
-import find from 'lodash/find'
-import debounce from 'lodash/debounce'
-import memoize from 'lodash/memoize'
-
-// Load needed stuff
-import countryData from './country_data.js'
+import { some, find, reduce, map, filter, includes } from 'lodash/collection';
+import { findIndex, head, tail } from 'lodash/array';
+import { debounce, memoize } from 'lodash/function';
+import { trim, startsWith } from 'lodash/string';
+import React from 'react';
+import countryData from './country_data.js';
+import classNames from 'classnames';
 import style from './style.less'
 
-const startsWith = (str, needle) => str.indexOf(needle) === 0
-const tail = arr => { arr.shift(); return arr }
-const head = arr => arr.shift()
+let allCountries = countryData.allCountries;
 
-const allCountries = countryData.allCountries
-const isModernBrowser = Boolean(document.createElement('input').setSelectionRange);
-const keys = {
+let isModernBrowser = Boolean(document.createElement('input').setSelectionRange);
+
+
+let keys = {
   UP: 38,
   DOWN: 40,
   RIGHT: 39,
@@ -61,13 +54,13 @@ function excludeCountries(selectedCountries, excludedCountries) {
   if(excludedCountries.length === 0) {
     return selectedCountries;
   } else {
-    return selectedCountries.filter(selCountry => {
-      return excludedCountries.indexOf(selCountry.iso2) === -1;
+    return filter(selectedCountries, function(selCountry) {
+      return !includes(excludedCountries, selCountry.iso2);
     });
   }
 }
 
-class ReactPhoneInput extends Component {
+class ReactPhoneInput extends React.Component {
 
   constructor(props) {
     super(props);
@@ -79,7 +72,7 @@ class ReactPhoneInput extends Component {
 			selectedCountryGuess.dialCode : '';
     let formattedNumber = this.formatNumber(dialCode + inputNumber.replace(/\D/g, ''), selectedCountryGuess ?
 			selectedCountryGuess.format : null);
-		let preferredCountries = allCountries.filter(country => {
+		let preferredCountries = filter(allCountries, (country) => {
 			return some(this.props.preferredCountries, (preferredCountry) => {
 				return preferredCountry === country.iso2;
 			});
@@ -119,13 +112,6 @@ class ReactPhoneInput extends Component {
 
   getNumber() {
     return this.state.formattedNumber !== '+' ? this.state.formattedNumber : '';
-  }
-
-  isValid(inputNumber) {
-    let countries = countryData.allCountries;
-    return some(countries, function(country) {
-      return inputNumber.indexOf(country.dialCode) === 0 || country.dialCode.indexOf(inputNumber) === 0;
-    });
   }
 
   getValue() {
@@ -348,6 +334,7 @@ class ReactPhoneInput extends Component {
   }
 
   _getHighlightCountryIndex(direction) {
+    // had to write own function because underscore does not have findIndex. lodash has it
     var highlightCountryIndex = this.state.highlightCountryIndex + direction;
 
     if(highlightCountryIndex < 0
@@ -432,8 +419,7 @@ class ReactPhoneInput extends Component {
   }
 
   getCountryDropDownList() {
-    const preferredCountries = this.state.preferredCountries.concat(this.state.onlyCountries)
-		const countryDropDownList = preferredCountries.map((country, index) => {
+		let countryDropDownList = map(this.state.preferredCountries.concat(this.state.onlyCountries), (country, index) => {
 			let itemClasses = classNames({
 				country: true,
 				preferred: country.iso2 === 'us' || country.iso2 === 'gb',
@@ -482,7 +468,7 @@ class ReactPhoneInput extends Component {
     });
     let inputClasses = classNames({
       "form-control": true,
-      "invalid-number": !this.isValid(this.state.formattedNumber.replace(/\D/g, ''))
+      "invalid-number": !this.props.isValid(this.state.formattedNumber.replace(/\D/g, ''))
     });
 
     let flagViewClasses = classNames({
@@ -526,7 +512,7 @@ ReactPhoneInput.prototype._searchCountry = memoize(function(queryString){
     return null;
   }
   // don't include the preferred countries in search
-  let probableCountries = this.state.onlyCountries.filter(function(country) {
+  let probableCountries = filter(this.state.onlyCountries, function(country) {
     return startsWith(country.name.toLowerCase(), queryString.toLowerCase());
   }, this);
   return probableCountries[0];
@@ -534,7 +520,7 @@ ReactPhoneInput.prototype._searchCountry = memoize(function(queryString){
 
 ReactPhoneInput.prototype.guessSelectedCountry = memoize(function(inputNumber, onlyCountries) {
   var secondBestGuess = find(allCountries, {iso2: this.props.defaultCountry}) || onlyCountries[0];
-  if(inputNumber.trim() !== '') {
+  if(trim(inputNumber) !== '') {
 		var bestGuess = reduce(onlyCountries, function(selectedCountry, country) {
 			if(startsWith(inputNumber, country.dialCode)) {
 				if(country.dialCode.length > selectedCountry.dialCode.length) {
@@ -564,6 +550,8 @@ ReactPhoneInput.defaultProps = {
   onlyCountries: [],
   excludeCountries: [],
   defaultCountry: allCountries[0].iso2,
+  isValid: isNumberValid,
+  flagsImagePath: './flags.png',
   onEnterKeyPress: function () {}
 };
 
