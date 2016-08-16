@@ -1,14 +1,3 @@
-// So each country array has the following information:
-// [
-//    Country name,
-//    iso2 code,
-//    International dial code,
-//    Format (if available),
-//    Order (if >1 country with same dial code),
-//    Area codes (if >1 country with same dial code)
-// ]
-// var _ = require('lodash');
-
 var allCountries = [
     [
       "Afghanistan",
@@ -196,7 +185,7 @@ var allCountries = [
       "Canada",
       "ca",
       "1",
-      "+. (...) ...-....",
+      "+. ... ...-....",
       1,
       ["204", "236", "249", "250", "289", "306", "343", "365", "387", "403", "416", "418", "431", "437", "438", "450", "506", "514", "519", "548", "579", "581", "587", "604", "613", "639", "647", "672", "705", "709", "742", "778", "780", "782", "807", "819", "825", "867", "873", "902", "905"]
     ],
@@ -1178,7 +1167,7 @@ var allCountries = [
       "United States",
       "us",
       "1",
-      "+. (...) ...-....",
+      "+. ... ... ....",
       0
     ],
     [
@@ -1237,24 +1226,13 @@ var allCountries = [
 
 // we will build this in the loop below
 var allCountryCodes = {};
-var addCountryCode = function(iso2, dialCode, priority) {
-if (!(dialCode in allCountryCodes)) {
-  allCountryCodes[dialCode] = [];
-}
-var index = priority || 0;
-allCountryCodes[dialCode][index] = iso2;
+var addCountryCode = (iso2, dialCode, priority) => {
+  if (!(dialCode in allCountryCodes)) {
+    allCountryCodes[dialCode] = [];
+  }
+  var index = priority || 0;
+  allCountryCodes[dialCode][index] = iso2;
 };
-
-// loop over all of the countries above
-// allCountries2 = _.map(allCountries, function(country) {
-//   return {
-//     name: country[0],
-//     iso2: country[1],
-//     dialCode: country[2],
-//     format: country[3],
-//     hasAreaCodes: country.length > 4
-//   }
-// });
 
 for (var i = 0; i < allCountries.length; i++) {
     // countries
