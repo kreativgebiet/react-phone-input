@@ -9,6 +9,13 @@ const reactExternal = {
   amd: 'react',
 }
 
+const reactDomExternal = {
+  root: 'ReactDOM',
+  commonjs2: 'react-dom',
+  commonjs: 'react-dom',
+  amd: 'react-dom',
+}
+
 module.exports = merge(common, {
   entry: {
     'react-phone-input': './src/index.js',
@@ -21,14 +28,7 @@ module.exports = merge(common, {
   },
   externals: [{
     'react': reactExternal,
-    'react-dom': 'ReactDOM',
-    'classnames': 'classnames',
-    'lodash/findIndex': 'lodash/findIndex',
-    'lodash/some': 'lodash/some',
-    'lodash/reduce': 'lodash/reduce',
-    'lodash/find': 'lodash/find',
-    'lodash/debounce': 'lodash/debounce',
-    'lodash/memoize': 'lodash/memoize',
+    'react-dom': reactDomExternal,
   }],
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
